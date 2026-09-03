@@ -1,0 +1,11 @@
+{
+  "name": "currogator",
+  "version": "0.1.0",
+  "description": "Turn a photo of a drawing into a printable ChompShop pattern.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "python3 -m http.server 8080",
+    "test": "node --test 'test/*.test.js'"
+  }
+}
