@@ -1,0 +1,10 @@
+.git
+.github
+node_modules
+test
+*.md
+package.json
+dev-serve.json
+Dockerfile
+docker-compose.yml
+.dockerignore
