@@ -1,4 +1,4 @@
-# Currogator
+# Corrugator
 
 Turn a photo of a drawing into a printable [ChompShop](https://chompshop.com)
 pattern — a true-scale cut line your ChompSaw can follow, with the fold, hole

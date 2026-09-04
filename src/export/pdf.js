@@ -240,7 +240,7 @@ export function buildPdf(pages, meta = {}) {
   }
   const title = meta.title ? `/Title (${escapeText(meta.title)}) ` : '';
   out += `trailer\n<< /Size ${count + 1} /Root ${CATALOG} 0 R ` +
-    `/Info << ${title}/Producer (Currogator) >> >>\n`;
+    `/Info << ${title}/Producer (Corrugator) >> >>\n`;
   out += `startxref\n${xrefStart}\n%%EOF\n`;
 
   const bytes = new Uint8Array(out.length);

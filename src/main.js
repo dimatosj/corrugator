@@ -22,7 +22,7 @@ import {
 } from './legend.js';
 
 const $ = (id) => document.getElementById(id);
-const STORAGE_KEY = 'currogator.settings.v1';
+const STORAGE_KEY = 'corrugator.settings.v1';
 
 const DEFAULTS = {
   mode: 'cutout',
