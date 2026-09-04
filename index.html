@@ -152,11 +152,14 @@
         <label class="toggle" title="Show the photo behind the pattern">
           <input type="checkbox" id="showPhoto"> Photo
         </label>
+        <button type="button" id="bgBtn" class="btn btn-icon btn-bg" title="Change the stage background">
+          <span class="bg-swatch" aria-hidden="true"></span><span id="bgLabel">Paper</span>
+        </button>
         <button type="button" id="fitBtn" class="btn btn-icon" title="Fit to window">⤢</button>
       </div>
     </div>
 
-    <div class="stage" id="stage">
+    <div class="stage" id="stage" data-bg="paper">
       <svg id="preview" class="preview" xmlns="http://www.w3.org/2000/svg"
            role="img" aria-label="Pattern preview"></svg>
       <div class="stage-empty" id="stageEmpty">

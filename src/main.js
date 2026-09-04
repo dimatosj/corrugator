@@ -36,7 +36,15 @@ const DEFAULTS = {
   units: 'mm',
   pageSize: 'letter',
   orientation: 'portrait',
+  stageBg: 'paper',
 };
+
+/** Stage backgrounds, in the order the button cycles through them. */
+const STAGE_BGS = [
+  { id: 'paper', label: 'Paper' },
+  { id: 'checker', label: 'Checker' },
+  { id: 'dark', label: 'Dark' },
+];
 
 const UNIT_TO_MM = { mm: 1, cm: 10, in: 25.4 };
 
@@ -510,6 +518,14 @@ function init() {
   $('fitBtn').addEventListener('click', () => editor.fit(patternBox(state.pattern)));
   $('showPhoto').addEventListener('change', render);
 
+  applyStageBg();
+  $('bgBtn').addEventListener('click', () => {
+    const i = STAGE_BGS.findIndex((b) => b.id === state.settings.stageBg);
+    state.settings.stageBg = STAGE_BGS[(i + 1) % STAGE_BGS.length].id;
+    saveSettings();
+    applyStageBg();
+  });
+
   document.addEventListener('keydown', (e) => {
     const typing = /^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName);
     if (typing) return;
@@ -548,6 +564,19 @@ function init() {
   });
 
   updateReadouts();
+
+  // ?example loads the built-in drawing straight away: handy for a demo link,
+  // and for driving the page from a test without clicking.
+  if (new URLSearchParams(location.search).has('example')) {
+    useSource(exampleSource());
+  }
+}
+
+function applyStageBg() {
+  const bg = STAGE_BGS.find((b) => b.id === state.settings.stageBg) ?? STAGE_BGS[0];
+  $('stage').dataset.bg = bg.id;
+  $('bgBtn').closest('.stage-bar').dataset.bg = bg.id;
+  $('bgLabel').textContent = bg.label;
 }
 
 function applyWidth() {
