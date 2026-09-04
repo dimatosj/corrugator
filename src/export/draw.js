@@ -7,7 +7,6 @@
  */
 
 import { LEGEND, LEGEND_ORDER, CHECKER_MM, CUT, HOLE, TAPE_FRONT, TAPE_BACK } from '../legend.js';
-import { markBox } from '../pattern.js';
 
 /**
  * @typedef {{kind:'path', path:Path, stroke:string, width:number, dash:number[]|null}
@@ -145,37 +144,3 @@ export function usedMarkTypes(pattern) {
   for (const mark of pattern.marks) used.add(mark.type);
   return used;
 }
-
-/** Bounding box of a primitive list, for laying out a page. */
-export function primitivesBox(prims) {
-  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-  const add = (x, y) => {
-    if (x < minX) minX = x;
-    if (y < minY) minY = y;
-    if (x > maxX) maxX = x;
-    if (y > maxY) maxY = y;
-  };
-  for (const p of prims) {
-    if (p.kind === 'path') {
-      for (const seg of p.path) {
-        if (seg.c === 'Z') continue;
-        if (seg.c === 'C') add(seg.x1, seg.y1), add(seg.x2, seg.y2);
-        add(seg.x, seg.y);
-      }
-    } else if (p.kind === 'line') {
-      add(...p.a);
-      add(...p.b);
-    } else if (p.kind === 'circle') {
-      add(p.x - p.r, p.y - p.r);
-      add(p.x + p.r, p.y + p.r);
-    } else if (p.kind === 'rect' || p.kind === 'checker') {
-      add(p.x, p.y);
-      add(p.x + p.w, p.y + p.h);
-    } else if (p.kind === 'text') {
-      add(p.x, p.y);
-    }
-  }
-  return Number.isFinite(minX) ? { minX, minY, maxX, maxY } : null;
-}
-
-export { markBox };

@@ -303,7 +303,7 @@ export function patternToPdf(pattern, opts = {}) {
   const cols = Math.max(1, Math.ceil((patW - overlapMm) / step));
   const rows = Math.max(1, Math.ceil((patH - overlapMm) / stepY));
 
-  pages.push(overviewPage(pageW, pageH, marginMm, prims, patW, patH, cols, rows, step, stepY, used, keyHeight));
+  pages.push(overviewPage(pageW, pageH, marginMm, prims, patW, patH, cols, rows, step, stepY, printW, printH, used, keyHeight));
 
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < cols; col++) {
@@ -325,7 +325,7 @@ export function patternToPdf(pattern, opts = {}) {
 }
 
 /** A shrunken map of the whole pattern with the tile grid over it. */
-function overviewPage(pageW, pageH, margin, prims, patW, patH, cols, rows, step, stepY, used, keyHeight) {
+function overviewPage(pageW, pageH, margin, prims, patW, patH, cols, rows, step, stepY, tileW, tileH, used, keyHeight) {
   const page = new PdfPage(pageW, pageH);
   const printW = pageW - margin * 2;
 
@@ -370,10 +370,17 @@ function overviewPage(pageW, pageH, margin, prims, patW, patH, cols, rows, step,
   page.save().strokeColor('#cccccc').lineWidth(0.3).dash(null);
   page.rect(mapX, mapTop, mapW, mapH).stroke().restore();
 
+  // Centre each label on the part of the pattern that sheet actually carries.
+  // The last row and column are usually only partly covered, so splitting the
+  // full tile would shove their labels off the edge of the map.
+  const midpoint = (index, tileStep, tileSize, extent) => {
+    const lo = index * tileStep;
+    return (lo + Math.min(lo + tileSize, extent)) / 2;
+  };
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
-      const x = mapX + Math.min(c * step + step / 2, patW) * scale;
-      const y = mapTop + Math.min(r * stepY + stepY / 2, patH) * scale;
+      const x = mapX + midpoint(c, step, tileW, patW) * scale;
+      const y = mapTop + midpoint(r, stepY, tileH, patH) * scale;
       page.text(x - 4, y, 3.2, `${r + 1}-${String.fromCharCode(65 + c)}`, '#999999', true);
     }
   }

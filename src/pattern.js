@@ -88,12 +88,20 @@ export function patternFromMask(traced, opts) {
     widthMm: finalBox ? finalBox.maxX : targetWidthMm,
     heightMm: finalBox ? finalBox.maxY : 0,
     sourcePxPerMm: scale > 0 ? 1 / scale : 1,
+    // Where the whole source image lands in pattern space, so the preview can
+    // show the photo lined up behind the traced lines.
+    image: {
+      x: -box.minX * scale,
+      y: -box.minY * scale,
+      w: w * scale,
+      h: h * scale,
+    },
   };
 }
 
 /** @returns {Pattern} */
 export function emptyPattern(widthMm = 200) {
-  return { parts: [], marks: [], widthMm, heightMm: 0, sourcePxPerMm: 1 };
+  return { parts: [], marks: [], widthMm, heightMm: 0, sourcePxPerMm: 1, image: null };
 }
 
 /**
@@ -192,6 +200,9 @@ export function resizePattern(pattern, widthMm) {
     widthMm: pattern.widthMm * s,
     heightMm: pattern.heightMm * s,
     sourcePxPerMm: pattern.sourcePxPerMm / s,
+    image: pattern.image
+      ? { x: pattern.image.x * s, y: pattern.image.y * s, w: pattern.image.w * s, h: pattern.image.h * s }
+      : null,
   };
 }
 

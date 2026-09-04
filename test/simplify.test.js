@@ -88,3 +88,38 @@ test('ringToShape turns a traced pixel square into a small closed path', () => {
 test('ringToShape rejects a degenerate ring', () => {
   assert.deepEqual(ringToShape([[0, 0], [1, 1]]), []);
 });
+
+test('smoothing never sends a control handle past the segment it belongs to', () => {
+  // A long spike between two long edges: the case where uniform Catmull-Rom
+  // overshoots and the cut line doubles back on itself.
+  const spike = [[0, 0], [100, 0], [102, 60], [104, 0], [200, 0], [200, 100], [0, 100]];
+  const path = ringToPath(spike, 1);
+
+  for (const seg of path) {
+    if (seg.c !== 'C') continue;
+    const span = Math.hypot(seg.x - seg.x1, seg.y - seg.y1);
+    assert.ok(Number.isFinite(span));
+  }
+
+  // Sample every cubic and check it stays within a sane distance of its ends,
+  // which a looping overshoot would not.
+  let prev = [path[0].x, path[0].y];
+  for (const seg of path) {
+    if (seg.c !== 'C') continue;
+    const end = [seg.x, seg.y];
+    const chord = Math.hypot(end[0] - prev[0], end[1] - prev[1]);
+    for (let i = 1; i < 8; i++) {
+      const t = i / 8;
+      const mt = 1 - t;
+      const px = mt ** 3 * prev[0] + 3 * mt * mt * t * seg.x1 + 3 * mt * t * t * seg.x2 + t ** 3 * end[0];
+      const py = mt ** 3 * prev[1] + 3 * mt * mt * t * seg.y1 + 3 * mt * t * t * seg.y2 + t ** 3 * end[1];
+      const stray = Math.min(
+        Math.hypot(px - prev[0], py - prev[1]),
+        Math.hypot(px - end[0], py - end[1]),
+      );
+      assert.ok(stray <= chord * 1.05 + 1e-6,
+        `curve strayed ${stray.toFixed(2)} from a chord of ${chord.toFixed(2)}`);
+    }
+    prev = end;
+  }
+});

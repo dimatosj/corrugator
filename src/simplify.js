@@ -147,18 +147,39 @@ export function ringToPath(pts, smooth = 0) {
     const p1 = pts[i];
     const p2 = pts[(i + 1) % n];
     const p3 = pts[(i + 2) % n];
+
+    const span = Math.hypot(p2[0] - p1[0], p2[1] - p1[1]);
+    const t1 = clampTangent([(p2[0] - p0[0]) * k, (p2[1] - p0[1]) * k], span);
+    const t2 = clampTangent([(p3[0] - p1[0]) * k, (p3[1] - p1[1]) * k], span);
+
     path.push({
       c: 'C',
-      x1: p1[0] + (p2[0] - p0[0]) * k,
-      y1: p1[1] + (p2[1] - p0[1]) * k,
-      x2: p2[0] - (p3[0] - p1[0]) * k,
-      y2: p2[1] - (p3[1] - p1[1]) * k,
+      x1: p1[0] + t1[0],
+      y1: p1[1] + t1[1],
+      x2: p2[0] - t2[0],
+      y2: p2[1] - t2[1],
       x: p2[0],
       y: p2[1],
     });
   }
   path.push({ c: 'Z' });
   return path;
+}
+
+/**
+ * Keep a control handle inside a third of the segment it belongs to.
+ *
+ * Uniform Catmull-Rom derives its tangents from the neighbours either side, so
+ * at a sharp corner between two long edges the handle can reach past the far
+ * end of a short segment and the curve loops back on itself. On a pattern that
+ * loop is a cut line that doubles back, so clamp rather than allow it.
+ */
+function clampTangent(t, span) {
+  const len = Math.hypot(t[0], t[1]);
+  const max = span / 3;
+  if (len <= max || len === 0) return t;
+  const s = max / len;
+  return [t[0] * s, t[1] * s];
 }
 
 /**

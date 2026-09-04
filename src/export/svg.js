@@ -7,7 +7,7 @@
  */
 
 import { pathToD } from '../geometry.js';
-import { LEGEND_ORDER, LEGEND, CHECKER_MM } from '../legend.js';
+import { LEGEND_ORDER } from '../legend.js';
 import { patternBox } from '../pattern.js';
 import { patternPrimitives, legendPrimitives, legendHeight, usedMarkTypes } from './draw.js';
 
@@ -100,10 +100,3 @@ export function patternToSvg(pattern, opts = {}) {
     '',
   ].join('\n');
 }
-
-/** The on-screen preview: the pattern only, no legend, no page padding. */
-export function patternToPreviewSvg(pattern) {
-  return patternToSvg(pattern, { padMm: 2, includeLegend: false });
-}
-
-export { CHECKER_MM, LEGEND };

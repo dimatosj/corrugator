@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Currogator — drawing to ChompShop pattern</title>
+<meta name="description" content="Turn a photo of a drawing into a printable ChompShop pattern.">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🐊</text></svg>">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true">🐊</span>
+    <div>
+      <h1>Currogator</h1>
+      <p>Photo of a drawing &rarr; printable ChompShop pattern</p>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <a class="link" href="https://learn.chompshop.com/pattern-guide" target="_blank" rel="noopener">Pattern guide ↗</a>
+  </div>
+</header>
+
+<main class="layout">
+
+  <!-- ── Left: source and tracing ─────────────────────────────── -->
+  <aside class="panel panel-left">
+    <section class="step">
+      <h2><span class="step-num">1</span> Your drawing</h2>
+      <div id="dropzone" class="dropzone" tabindex="0" role="button"
+           aria-label="Add a photo of a drawing">
+        <div class="dropzone-empty">
+          <p class="dropzone-hint">Drop a photo here</p>
+          <div class="dropzone-buttons">
+            <label class="btn btn-primary">
+              Take a photo
+              <input type="file" id="cameraInput" accept="image/*" capture="environment" hidden>
+            </label>
+            <label class="btn">
+              Choose a file
+              <input type="file" id="fileInput" accept="image/*" hidden>
+            </label>
+          </div>
+          <button type="button" id="exampleBtn" class="btn btn-quiet">Try an example</button>
+        </div>
+        <img id="thumb" class="thumb" alt="" hidden>
+      </div>
+      <p class="hint">Best results: a flat drawing in even light, bold dark lines, whole page in frame.</p>
+    </section>
+
+    <section class="step" id="traceStep" hidden>
+      <h2><span class="step-num">2</span> Trace it</h2>
+
+      <label class="field">
+        <span class="field-label">What to cut</span>
+        <select id="mode">
+          <option value="cutout">Cut around the whole drawing</option>
+          <option value="windows">Cut around it, and cut out the gaps</option>
+          <option value="ink">Cut out the lines themselves</option>
+        </select>
+      </label>
+
+      <label class="field">
+        <span class="field-label">Ink sensitivity <output id="sensitivityOut"></output></span>
+        <input type="range" id="sensitivity" min="-40" max="40" step="1" value="0">
+        <span class="field-note">Left picks up less, right picks up more.</span>
+      </label>
+
+      <label class="field">
+        <span class="field-label">Close gaps <output id="closeGapsOut"></output></span>
+        <input type="range" id="closeGaps" min="0" max="16" step="1" value="5">
+        <span class="field-note">Joins up lines that do not quite meet.</span>
+      </label>
+
+      <label class="field">
+        <span class="field-label">Smooth corners <output id="smoothOut"></output></span>
+        <input type="range" id="smooth" min="0" max="100" step="5" value="80">
+      </label>
+
+      <label class="field">
+        <span class="field-label">Detail <output id="detailOut"></output></span>
+        <input type="range" id="detail" min="0" max="100" step="5" value="60">
+        <span class="field-note">Less detail is easier to cut.</span>
+      </label>
+
+      <label class="field">
+        <span class="field-label">Margin around the drawing <output id="growOut"></output></span>
+        <input type="range" id="grow" min="0" max="20" step="1" value="0">
+      </label>
+
+      <label class="field">
+        <span class="field-label">Ignore specks smaller than <output id="minPartOut"></output></span>
+        <input type="range" id="minPart" min="0" max="40" step="1" value="8">
+      </label>
+
+      <button type="button" id="resetTrace" class="btn btn-quiet btn-block">Reset tracing</button>
+    </section>
+
+    <section class="step" id="sizeStep" hidden>
+      <h2><span class="step-num">3</span> Finished size</h2>
+      <div class="size-row">
+        <label class="field field-inline">
+          <span class="field-label">Width</span>
+          <input type="number" id="widthInput" min="10" step="1" value="200">
+        </label>
+        <label class="field field-inline">
+          <span class="field-label">Units</span>
+          <select id="units">
+            <option value="mm">mm</option>
+            <option value="cm">cm</option>
+            <option value="in">inches</option>
+          </select>
+        </label>
+      </div>
+      <p class="hint" id="sizeReadout"></p>
+    </section>
+  </aside>
+
+  <!-- ── Centre: the pattern ──────────────────────────────────── -->
+  <section class="stage-wrap">
+    <div class="stage-bar">
+      <div class="stage-bar-group" id="toolbar" role="toolbar" aria-label="Pattern tools">
+        <button type="button" class="tool" data-tool="select" aria-pressed="true" title="Select and move marks">
+          <span class="tool-swatch tool-swatch-select"></span><span>Select</span>
+        </button>
+        <button type="button" class="tool" data-tool="hole" aria-pressed="false" title="Click to add a punched hole">
+          <span class="tool-swatch" style="--c:#2F9E44"></span><span>Hole</span>
+        </button>
+        <button type="button" class="tool" data-tool="foldUp" aria-pressed="false" title="Drag to add a fold-up line">
+          <span class="tool-swatch" style="--c:#E03131"></span><span>Fold up</span>
+        </button>
+        <button type="button" class="tool" data-tool="foldDown" aria-pressed="false" title="Drag to add a fold-down line">
+          <span class="tool-swatch" style="--c:#1971C2"></span><span>Fold down</span>
+        </button>
+        <button type="button" class="tool" data-tool="drawBox" aria-pressed="false" title="Drag to add a draw-here box">
+          <span class="tool-swatch" style="--c:#E03131"></span><span>Draw box</span>
+        </button>
+        <button type="button" class="tool" data-tool="tapeFront" aria-pressed="false" title="Drag to add tape on the front">
+          <span class="tool-swatch" style="--c:#F0B400"></span><span>Tape front</span>
+        </button>
+        <button type="button" class="tool" data-tool="tapeBack" aria-pressed="false" title="Drag to add tape on the back">
+          <span class="tool-swatch" style="--c:#8E44AD"></span><span>Tape back</span>
+        </button>
+      </div>
+      <div class="stage-bar-group stage-bar-right">
+        <button type="button" id="undoBtn" class="btn btn-icon" title="Undo (Ctrl+Z)" disabled>↶</button>
+        <button type="button" id="redoBtn" class="btn btn-icon" title="Redo (Ctrl+Shift+Z)" disabled>↷</button>
+        <button type="button" id="deleteBtn" class="btn btn-icon" title="Delete selected mark (Del)" disabled>🗑</button>
+        <span class="sep" role="separator"></span>
+        <label class="toggle" title="Show the photo behind the pattern">
+          <input type="checkbox" id="showPhoto"> Photo
+        </label>
+        <button type="button" id="fitBtn" class="btn btn-icon" title="Fit to window">⤢</button>
+      </div>
+    </div>
+
+    <div class="stage" id="stage">
+      <svg id="preview" class="preview" xmlns="http://www.w3.org/2000/svg"
+           role="img" aria-label="Pattern preview"></svg>
+      <div class="stage-empty" id="stageEmpty">
+        <p>Add a photo of a drawing to get started.</p>
+      </div>
+      <div class="stage-busy" id="stageBusy" hidden><span class="spinner"></span> Tracing…</div>
+    </div>
+
+    <p class="stage-help" id="stageHelp">Scroll to zoom · drag the background to pan</p>
+  </section>
+
+  <!-- ── Right: legend, checks, export ────────────────────────── -->
+  <aside class="panel panel-right">
+    <section class="step">
+      <h2>What the marks mean</h2>
+      <ul class="legend" id="legendList"></ul>
+    </section>
+
+    <section class="step">
+      <h2>Check before you print</h2>
+      <ul class="notes" id="notes"><li class="note-info">Nothing traced yet.</li></ul>
+    </section>
+
+    <section class="step">
+      <h2>Print it</h2>
+      <div class="size-row">
+        <label class="field field-inline">
+          <span class="field-label">Paper</span>
+          <select id="pageSize">
+            <option value="letter">US Letter</option>
+            <option value="a4">A4</option>
+            <option value="legal">US Legal</option>
+            <option value="a3">A3</option>
+          </select>
+        </label>
+        <label class="field field-inline">
+          <span class="field-label">Layout</span>
+          <select id="orientation">
+            <option value="portrait">Portrait</option>
+            <option value="landscape">Landscape</option>
+          </select>
+        </label>
+      </div>
+      <p class="hint" id="pagesReadout"></p>
+      <div class="export-buttons">
+        <button type="button" id="pdfBtn" class="btn btn-primary btn-block" disabled>Download PDF</button>
+        <button type="button" id="svgBtn" class="btn btn-block" disabled>Download SVG</button>
+      </div>
+      <p class="hint">Print at 100% — turn off “fit to page”. Then glue the sheets to cardboard and chomp.</p>
+    </section>
+  </aside>
+</main>
+
+<footer class="footer">
+  <p>
+    Everything runs in your browser. Photos are never uploaded anywhere.
+    Pattern language from the <a href="https://learn.chompshop.com/pattern-guide" target="_blank" rel="noopener">ChompShop pattern guide</a>.
+    Not affiliated with ChompShop.
+  </p>
+</footer>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
