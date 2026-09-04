@@ -66,7 +66,7 @@ export function primitiveToSvg(p) {
  * @returns {string}
  */
 export function patternToSvg(pattern, opts = {}) {
-  const { padMm = 5, includeLegend = true, title = 'ChompShop pattern' } = opts;
+  const { padMm = 5, includeLegend = true, title = 'Corrugator pattern' } = opts;
 
   const box = patternBox(pattern);
   const patW = Math.max(box.maxX - box.minX, 0.1);

@@ -548,7 +548,7 @@ function init() {
 
   $('svgBtn').addEventListener('click', () => {
     const svg = patternToSvg(state.pattern);
-    download(new Blob([svg], { type: 'image/svg+xml' }), `chomp-pattern-${stamp()}.svg`);
+    download(new Blob([svg], { type: 'image/svg+xml' }), `corrugator-pattern-${stamp()}.svg`);
   });
 
   $('pdfBtn').addEventListener('click', () => {
@@ -556,7 +556,7 @@ function init() {
       pageSize: state.settings.pageSize,
       landscape: state.settings.orientation === 'landscape',
     });
-    download(new Blob([bytes], { type: 'application/pdf' }), `chomp-pattern-${stamp()}.pdf`);
+    download(new Blob([bytes], { type: 'application/pdf' }), `corrugator-pattern-${stamp()}.pdf`);
   });
 
   window.addEventListener('resize', () => {

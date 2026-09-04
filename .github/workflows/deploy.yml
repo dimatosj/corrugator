@@ -1,0 +1,58 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Serialise deploys. Two concurrent `docker compose up -d` runs on this
+# platform cause a container-rename race that can leave the service DOWN.
+concurrency:
+  group: deploy-corrugator
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_IP }}
+          username: deploy
+          key: ${{ secrets.SSH_DEPLOY_KEY }}
+          command_timeout: 10m
+          script: |
+            set -euo pipefail
+            cd /opt/projects/corrugator
+
+            # reset, never pull: a hand-edit on the box can block a pull and
+            # ship nothing while the job still goes green.
+            git fetch origin main
+            git reset --hard origin/main
+            SHA=$(git rev-parse HEAD)
+            echo "deploying $SHA"
+
+            docker compose up -d --build --remove-orphans
+
+            for i in $(seq 1 20); do
+              curl -sf -o /dev/null https://corrugator.forklore.xyz/ && break
+              [ "$i" -eq 20 ] && { echo "site never came back up"; exit 1; }
+              sleep 3
+            done
+
+            # Green must mean shipped: compare served bytes to committed blobs.
+            FAIL=0
+            for f in index.html styles.css src/main.js; do
+              want=$(git cat-file blob "$SHA:$f" | sha256sum | cut -d' ' -f1)
+              got=$(curl -fsS "https://corrugator.forklore.xyz/$f" | sha256sum | cut -d' ' -f1)
+              if [ "$want" = "$got" ]; then
+                echo "ok       $f"
+              else
+                echo "MISMATCH $f"
+                echo "  want=$want"
+                echo "  got =$got"
+                FAIL=1
+              fi
+            done
+            exit "$FAIL"

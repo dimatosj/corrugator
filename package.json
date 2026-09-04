@@ -1,7 +1,7 @@
 {
   "name": "corrugator",
   "version": "0.1.0",
-  "description": "Turn a photo of a drawing into a printable ChompShop pattern.",
+  "description": "Turn a photo of a drawing into a printable cardboard cutting pattern.",
   "type": "module",
   "private": true,
   "scripts": {

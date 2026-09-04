@@ -1,10 +1,13 @@
 /**
- * The ChompShop pattern language.
+ * The mark conventions this app draws with.
  *
- * Source: the ChompShop Learning Hub pattern guide
- * (https://learn.chompshop.com/pattern-guide). The meanings below are taken
- * verbatim from the guide; the hex values are close visual matches chosen for
- * print legibility, not sampled from ChompShop artwork.
+ * They follow the colour-and-line system that ChompShop documents publicly in
+ * its pattern guide (https://learn.chompshop.com/pattern-guide), so a pattern
+ * from this app reads the same way as one a maker already knows. Everything in
+ * this file is written in our own words; no ChompShop text, artwork, or
+ * pattern files are included, and the hex values are our own choices for
+ * print legibility. ChompShop and ChompSaw are trademarks of their owner; this
+ * project is independent and not affiliated with or endorsed by them.
  */
 
 /** @typedef {'cut'|'foldUp'|'foldDown'|'hole'|'drawBox'|'tapeFront'|'tapeBack'} MarkType */
@@ -30,18 +33,18 @@ export const LEGEND = {
   [CUT]: {
     id: CUT,
     label: 'Cut',
-    meaning: 'Cut out each part with your ChompSaw. Chomp right on the line.',
+    meaning: 'Cut along this line to free the part. Stay on the line, not inside or outside it.',
     color: '#111111',
     shape: 'path',
     dash: null,
     width: 0.6,
     fill: 'none',
-    tool: 'ChompSaw',
+    tool: 'Cardboard saw',
   },
   [FOLD_UP]: {
     id: FOLD_UP,
     label: 'Fold up',
-    meaning: 'Fold upwards to make a valley.',
+    meaning: 'Fold so the two sides come up towards you, making a valley.',
     color: '#E03131',
     shape: 'line',
     dash: [3, 2],
@@ -52,7 +55,7 @@ export const LEGEND = {
   [FOLD_DOWN]: {
     id: FOLD_DOWN,
     label: 'Fold down',
-    meaning: 'Fold downwards to make a mountain peak.',
+    meaning: 'Fold so the two sides go down away from you, making a mountain.',
     color: '#1971C2',
     shape: 'line',
     dash: [3, 2],
@@ -63,18 +66,18 @@ export const LEGEND = {
   [HOLE]: {
     id: HOLE,
     label: 'Punch a hole',
-    meaning: 'Twist your Hole Punch into the cardboard here, like a screwdriver.',
+    meaning: 'Make a hole here with the hole punch.',
     color: '#2F9E44',
     shape: 'circle',
     dash: null,
     width: 0.5,
     fill: 'none',
-    tool: 'Hole Punch',
+    tool: 'Hole punch',
   },
   [DRAW_BOX]: {
     id: DRAW_BOX,
     label: 'Draw here',
-    meaning: 'Draw your own design here, or use the box to line parts up.',
+    meaning: 'A space for your own drawing, or a guide for lining parts up.',
     color: '#E03131',
     shape: 'rect',
     dash: null,
@@ -85,7 +88,7 @@ export const LEGEND = {
   [TAPE_FRONT]: {
     id: TAPE_FRONT,
     label: 'Tape (front)',
-    meaning: 'Put double-sided tape on the front of the part here.',
+    meaning: 'Stick double-sided tape here, on the front of the part.',
     color: '#F0B400',
     shape: 'rect',
     dash: null,
@@ -96,7 +99,7 @@ export const LEGEND = {
   [TAPE_BACK]: {
     id: TAPE_BACK,
     label: 'Tape (back)',
-    meaning: 'Put double-sided tape on the back of the part here.',
+    meaning: 'Stick double-sided tape here, on the back of the part.',
     color: '#8E44AD',
     shape: 'rect',
     dash: null,

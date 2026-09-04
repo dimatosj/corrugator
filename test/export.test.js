@@ -182,7 +182,7 @@ test('an oversized pattern tiles across sheets and adds a guide page', () => {
   const { pageCount, text } = inspectPdf(pdf);
   // 700mm wide over ~180mm of usable width, minus overlap, is at least 4 across.
   assert.ok(pageCount >= 5, `expected a guide page plus tiles, got ${pageCount}`);
-  assert.ok(text.includes('Your ChompShop pattern'), 'the guide page is there');
+  assert.ok(text.includes('Your cardboard pattern'), 'the guide page is there');
   assert.ok(text.includes('Sheet 1-A'), 'tiles are labelled');
 });
 

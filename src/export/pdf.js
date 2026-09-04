@@ -266,7 +266,7 @@ export function patternToPdf(pattern, opts = {}) {
     marginMm = 12,
     overlapMm = 12,
     landscape = false,
-    title = 'ChompShop pattern',
+    title = 'Corrugator pattern',
   } = opts;
 
   const size = PAGE_SIZES[pageSize] ?? PAGE_SIZES.letter;
@@ -329,7 +329,7 @@ function overviewPage(pageW, pageH, margin, prims, patW, patH, cols, rows, step,
   const page = new PdfPage(pageW, pageH);
   const printW = pageW - margin * 2;
 
-  page.text(margin, margin + 6, 6, 'Your ChompShop pattern', '#111111', true);
+  page.text(margin, margin + 6, 6, 'Your cardboard pattern', '#111111', true);
   page.text(margin, margin + 13, 3.4,
     `Print every sheet at 100% (no "fit to page"), then tape them together: ${cols} across, ${rows} down.`);
   page.text(margin, margin + 18.5, 3.4,
